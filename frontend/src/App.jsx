@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Activity, Server, Cpu, Database, ArrowRight, 
-  CheckCircle, Zap, Shield, BarChart3, ChevronDown, Terminal 
+  CheckCircle, Zap, Shield, BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { 
@@ -58,12 +58,16 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // --- IMPORTANT: LIVE BACKEND URL LINKED HERE ---
+  const API_URL = 'https://day25-sentinel.onrender.com'; 
+
   // Fetch Data Logic
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const healthRes = await axios.get('http://localhost:4000/health');
-        const metricsRes = await axios.get('http://localhost:4000/metrics');
+        // Using the live API_URL instead of localhost
+        const healthRes = await axios.get(`${API_URL}/health`);
+        const metricsRes = await axios.get(`${API_URL}/metrics`);
         
         const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
         const cpuLoad = metricsRes.data.cpu.loadAverage1Min;
@@ -78,14 +82,25 @@ export default function App() {
         
         setLoading(false);
       } catch (error) {
-        console.error("Backend offline");
+        console.error("Backend offline or CORS error");
         setLoading(false);
       }
     };
+    
     fetchData();
-    const interval = setInterval(fetchData, 2000);
+    const interval = setInterval(fetchData, 2000); // Poll every 2 seconds
     return () => clearInterval(interval);
   }, []);
+
+  const triggerStress = async () => {
+    try {
+      alert("⚠️ Initiating Stress Test: CPU will spike for 5 seconds!");
+      await axios.get(`${API_URL}/stress-test`);
+    } catch (error) {
+      console.error(error);
+      alert("Error connecting to stress test endpoint");
+    }
+  };
 
   const formatUptime = (s) => {
     const h = Math.floor(s / 3600);
@@ -149,20 +164,6 @@ export default function App() {
               Read Documentation
             </button>
           </div>
-        </motion.div>
-
-        {/* Hero Image Mockup */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="mt-16 rounded-xl border border-zinc-800 p-2 bg-zinc-900/50 backdrop-blur-sm max-w-5xl mx-auto"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop" 
-            alt="Dashboard Preview" 
-            className="rounded-lg opacity-80 border border-zinc-800"
-          />
         </motion.div>
       </section>
 
@@ -250,20 +251,31 @@ export default function App() {
       {/* 5. LIVE DASHBOARD (The Product) */}
       <section id="dashboard" className="py-20 bg-zinc-950 border-t border-zinc-900">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between items-end mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
             <div>
               <h2 className="text-2xl font-bold text-white">Live Instance Metrics</h2>
-              <p className="text-zinc-400 text-sm mt-1">Real-time data stream from localhost:4000</p>
+              <p className="text-zinc-400 text-sm mt-1">
+                Stream from: <span className="font-mono text-blue-400">{API_URL}</span>
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              LIVE CONNECTED
+            <div className="flex gap-4">
+               {/* Stress Test Button Included */}
+               <button 
+                  onClick={triggerStress}
+                  className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all"
+                >
+                  <Zap size={14} /> TRIGGER LOAD
+                </button>
+                <div className="flex items-center gap-2 text-xs font-mono text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                  CONNECTED
+                </div>
             </div>
           </div>
 
           {loading ? (
             <div className="h-64 rounded-xl border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-500">
-              Waiting for Backend Connection...
+              Connecting to Server...
             </div>
           ) : (
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm">

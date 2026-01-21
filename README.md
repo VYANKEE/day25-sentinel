@@ -25,7 +25,7 @@ Sentinel follows a **Client-Server Telemetry Architecture**:
 1.  **The Backend (Node.js/Express):**
     - Uses the native `os` and `process` modules to harvest low-level system data directly from the kernel.
     - Exposes a lightweight JSON stream via the `/metrics` endpoint.
-    - Includes a **Stress Test Engine** (`/stress-test`) to simulate high-traffic loads and demonstrate CPU spiking capabilities.
+
 
 2.  **The Frontend (React + Vite):**
     - Polls the telemetry stream every 2 seconds.

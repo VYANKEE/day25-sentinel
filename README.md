@@ -10,7 +10,7 @@
 ---
 
 ## 💡 Why I Built This? (The Problem)
-In modern backend development, **"Observability"** is often an afterthought. Beginners deploy Node.js servers and "hope" they stay running. But in production, servers crash due to:
+In modern backend development, **"Observability"**    is often an afterthought. Beginners deploy Node.js servers and "hope" they stay running. But in production, servers crash due to:
 - **Silent Memory Leaks:** Variables causing Heap memory to grow until the server runs out of RAM.
 - **CPU Spikes:** Heavy computational tasks blocking the single-threaded Event Loop.
 - **Zombie Processes:** Services that are "running" but not responding.
